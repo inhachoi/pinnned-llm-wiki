@@ -1,0 +1,4 @@
+visitSequence # D-003에서 폐기
+REGION_HAS_INCOMPLETE_TRIP # D-003에서 폐기
+partyTripsInRegion # D-003에서 partyTripInRegion(단건)으로
+totalTravelDays # D-002에서 폐기

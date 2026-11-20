@@ -9,6 +9,6 @@
 | 폴더 | 내용 |
 | --- | --- |
 | `raw/` | 원문 사본 (Figma 기획, 회의 요약, 노션 글). 구속력 없음 |
-| `wiki/` | 정리본. 에이전트가 쓰고 사람이 PR로 승인 |
+| `wiki/` | 정리본. 에이전트가 쓰고 점검을 통과하면 자동 반영 |
 
 코드 레포: [FE](https://github.com/mash-up-kr/Pinnned) · [BE](https://github.com/mash-up-kr/udumeoli-spring)

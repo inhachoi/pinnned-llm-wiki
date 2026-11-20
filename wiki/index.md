@@ -11,9 +11,32 @@ verified: 2026-11-20
 
 ## 등록부
 
-- [확정 결정](decisions.md) — 날짜순 결정과 이유. 의도의 근거는 여기다
+- [확정 결정](decisions.md) — 날짜순 결정과 이유 (D-001~). 의도의 근거는 여기다
 - [열린 질문](open-questions.md) — 아직 정해지지 않은 정책과 문서 간 충돌 (Q01~Q18)
+- [용어집](glossary.md) — 팟, 팟장, 초대코드, 티켓, 기록, 키워드, 핀, 슬롯, 리캡 등
 - [로그](log.md) — 수집·점검 기록
+
+## 제품 규칙 (기능별)
+
+- [인증·온보딩](product/auth-onboarding.md) — 로그인, 닉네임·아바타, 권한 팝업, 로딩 화면
+- [여행팟](product/pot.md) — 진입, 생성, 초대코드 참여(6자리·정원 6명), 전환, 설정·삭제·나가기
+- [지도](product/map.md) — 줌 단계, 대표 키워드와 동률 규칙, 핀·툴팁·바텀시트, 첫 진입 가이드
+- [기록 업로드](product/record-upload.md) — 키워드 → 사진 → 코멘트, 미리보기, 완료 처리
+- [앨범·사진 뷰어](product/album.md) — 지역 카드와 멤버 자리, 지역 앨범, 사진 수정·삭제
+- [리캡](product/recap.md) — 리캡 카드 구성, 통계, 멤버 정렬, 저장·공유
+- [마이페이지](product/my-page.md) — 프로필, 로그아웃, 계정 삭제, 약관
+
+## FE↔BE 계약
+
+- [인증](contract/auth.md) — 로그인 교환, 토큰 수명, refresh 1회용 규칙, 200과 401의 차이, 강제 로그아웃 조건
+- [에러 코드](contract/errors.md) — BE가 내는 GraphQL 코드와 HTTP 상태, FE의 처리. 스키마에만 있고 안 쓰이는 코드
+- [지역코드](contract/regions.md) — 2자리·5자리 코드 규칙과 예외(광역시, 세종)
+- [이미지 업로드](contract/images.md) — 업로드 URL 발급, 헤더, 썸네일 서비스 연동
+
+## 시스템
+
+- [에러 수집 파이프라인](system/error-pipeline.md) — 수집 → 노션 QA → 주간 트리아지 → 머지 후 정리, 세 자동화의 위치
+- [인프라](system/infra.md) — FE·BE·썸네일·봇이 도는 곳
 
 ## 디자인
 
