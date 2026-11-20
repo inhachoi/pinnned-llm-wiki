@@ -1,0 +1,88 @@
+name: Weekly Ingest
+
+# 매주 월요일 10:00 KST — 지난주에 머지된 PR과 raw/의 새 파일을 읽어 위키를 갱신한다.
+# 절차는 .github/ingest/PROMPT.md, 규칙은 AGENTS.md. 사람 승인 없이 점검을 통과하면 main에 반영한다.
+# CLAUDE_CODE_OAUTH_TOKEN 시크릿이 없으면 아무것도 하지 않고 끝난다.
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "대상 시작 (YYYY-MM-DD). 비우면 지난주 월요일"
+        required: false
+      until:
+        description: "대상 끝, 배타 (YYYY-MM-DD). 비우면 이번주 월요일"
+        required: false
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check token
+        id: gate
+        env:
+          TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "CLAUDE_CODE_OAUTH_TOKEN 없음 — 건너뜀"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Compute period (KST)
+        if: steps.gate.outputs.run == 'true'
+        id: period
+        env:
+          INPUT_SINCE: ${{ inputs.since }}
+          INPUT_UNTIL: ${{ inputs.until }}
+        run: |
+          set -euo pipefail
+          export TZ=Asia/Seoul
+          this_monday=$(date -d "$(date +%Y-%m-%d) -$(( $(date +%u) - 1 )) days" +%Y-%m-%d)
+          last_monday=$(date -d "$this_monday -7 days" +%Y-%m-%d)
+          echo "since=${INPUT_SINCE:-$last_monday}" >> "$GITHUB_OUTPUT"
+          echo "until=${INPUT_UNTIL:-$this_monday}" >> "$GITHUB_OUTPUT"
+          echo "today=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Configure git identity
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          git config user.name "wiki-ingest[bot]"
+          git config user.email "wiki-ingest@users.noreply.github.com"
+
+      - name: Run Claude ingest
+        if: steps.gate.outputs.run == 'true'
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            .github/ingest/PROMPT.md 를 읽고 그대로 수행한다.
+            대상 기간 since=${{ steps.period.outputs.since }} until=${{ steps.period.outputs.until }}
+            오늘=${{ steps.period.outputs.today }}
+          claude_args: |
+            --max-turns 80
+            --allowedTools "Bash(node:*),Bash(gh:*),Bash(git:*),Read,Edit,Write,Glob,Grep"
