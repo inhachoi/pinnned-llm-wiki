@@ -7,10 +7,6 @@ verified: 2026-11-20
 
 # 여행 앨범·사진 뷰어
 
-## 목적
-
-팟의 기록을 지역별로 모아 보고, 멤버별 기록 여부를 확인하며, 사진을 크게 보거나 내 사진을 수정·삭제한다.
-
 ## 흐름
 
 1. 앨범 목록에서 방문한 지역마다 카드 1장을 본다 (SPEC-11 §2)
@@ -74,8 +70,3 @@ verified: 2026-11-20
 - [Q11](../open-questions.md#q11) 팟원 공동 편집 권한 도입 여부
 - [Q12](../open-questions.md#q12) 마지막 1장 삭제와 일반 삭제의 복귀 위치
 
-## 원문
-
-- [SPEC-11 앨범 목록](../../raw/figma/SPEC-11-album-list.md)
-- [SPEC-12 지역 상세](../../raw/figma/SPEC-12-album-region.md)
-- [SPEC-13 사진 뷰어](../../raw/figma/SPEC-13-photo-viewer.md)

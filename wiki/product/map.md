@@ -7,10 +7,6 @@ verified: 2026-11-20
 
 # 여행 지도
 
-## 목적
-
-팟의 기록을 지도 위에 줌 단계별로 보여주고, 지역을 눌러 기록을 보거나 새 기록을 시작하게 한다.
-
 ## 흐름
 
 1. 첫 진입 시 [시작하기] 안내를 1회 본다. 서울이 화면 가운데에 온다 (SPEC-07 §1)
@@ -78,9 +74,3 @@ verified: 2026-11-20
 - [Q07](../open-questions.md#q07) 여행 앨범 탭 진입 조건 모순
 - [Q08](../open-questions.md#q08) 지역 재방문·날짜별 기록을 묶는 단위
 
-## 원문
-
-- [SPEC-05 줌인 기준 정리](../../raw/figma/SPEC-05-map-zoom.md)
-- [SPEC-06 지도 내 공통 디자인](../../raw/figma/SPEC-06-map-common.md)
-- [SPEC-07 지도 줌인 가이드](../../raw/figma/SPEC-07-map-first-guide.md)
-- [SPEC-08 등록 순서별 노출 UI](../../raw/figma/SPEC-08-map-record-states.md)

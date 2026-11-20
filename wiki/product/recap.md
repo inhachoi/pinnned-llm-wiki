@@ -7,10 +7,6 @@ verified: 2026-11-20
 
 # 리캡
 
-## 목적
-
-팟의 여행 통계와 지도를 이미지 한 장(리캡 카드)으로 만들어 저장·공유하게 한다.
-
 ## 흐름
 
 1. 지도의 Recap 버튼을 누르면 이미지 추출 화면으로 간다 (SPEC-14 §1)
@@ -68,7 +64,3 @@ verified: 2026-11-20
 - [Q13](../open-questions.md#q13) 기기 저장 vs 공유 시트, 이미지 비율·크기
 - [Q14](../open-questions.md#q14) 고유 지역 수 vs 핀 수, 5/6 경계 기준
 
-## 원문
-
-- [SPEC-14 리캡](../../raw/figma/SPEC-14-recap.md)
-- [SPEC-15 리캡 내부 디자인](../../raw/figma/SPEC-15-recap-card.md)

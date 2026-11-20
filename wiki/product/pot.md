@@ -7,10 +7,6 @@ verified: 2026-11-20
 
 # 여행팟 (진입·생성·참여·설정)
 
-## 목적
-
-여행팟을 만들거나 초대코드로 참여하고, 팟 사이를 전환하며, 이름·멤버·초대·삭제·나가기를 관리한다.
-
 ## 흐름
 
 1. 참여 중인 팟이 0개면 메인 진입 시 전용 화면에서 [새 팟 만들기] 또는 [초대코드로 참여하기]를 고른다 (SPEC-02 §1, §3, §4)
@@ -83,9 +79,3 @@ verified: 2026-11-20
 - [Q17](../open-questions.md#q17) 팟 나가기 시 삭제되는 데이터 범위 모순
 - [Q18](../open-questions.md#q18) 팟장 나가기 위임 문장 미완결, 0명 처리
 
-## 원문
-
-- [SPEC-02 진입점](../../raw/figma/SPEC-02-pot-entry.md)
-- [SPEC-03 새 팟 만들기](../../raw/figma/SPEC-03-pot-create.md)
-- [SPEC-04 초대코드로 참여하기](../../raw/figma/SPEC-04-pot-join.md)
-- [SPEC-17 팟 편집](../../raw/figma/SPEC-17-pot-settings.md)
