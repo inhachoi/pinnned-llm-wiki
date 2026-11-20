@@ -7,7 +7,7 @@ verified: 2026-11-20
 
 # 지역 코드 계약
 
-`regionCode`는 FE 지도(GeoJSON `properties.code`)와 BE 지역 테이블이 **같은 문자열**로 맞춰져 있다는 약속이다. 지역 테이블은 마이그레이션이 시딩하는 정적 데이터이고 앱은 읽기만 한다.
+`regionCode`는 FE의 이름↔코드 표(`fe:src/shared/api/region-codes.ts`)와 BE 지역 테이블이 **같은 문자열**로 맞춰져 있다는 약속이다. GeoJSON의 `properties.code`와는 다를 수 있다: 병합 시(11곳)와 광역시(8곳)는 첫 번째 구의 코드가 들어가므로(예: 37011 vs 37010) `properties.code`를 `regionCode`와 직접 비교하면 안 된다 (`fe:src/shared/lib/loadKoreaGeoJson.ts`). 지역 테이블은 마이그레이션이 시딩하는 정적 데이터이고 앱은 읽기만 한다.
 
 ## 형식 규칙
 
@@ -31,7 +31,7 @@ verified: 2026-11-20
 
 - `createTrip`은 테이블에 없는 `regionCode`를 `REGION_NOT_FOUND`로 거부한다. 형식이 그럴듯해도 테이블에 없으면 거부다.
 - 핀(Trip)은 `(팟, regionCode)`마다 하나다. 같은 지역에 다시 올리면 새 핀이 아니라 그 핀의 내 기록이 교체된다. 동시에 올려도 핀은 하나로 모인다.
-- BE는 기록된 `regionCode`를 **그대로** 돌려준다. `partyMapOverview.municipalities`에는 광역시 여행이 2자리(`"11"`)로 섞여 온다. FE는 자릿수로 폴리곤 출처를 고른다 — 2자리는 시·도 GeoJSON, 5자리는 시·군·구 GeoJSON.
+- BE는 기록된 `regionCode`를 **그대로** 돌려준다. `partyMapOverview.municipalities`에는 광역시 여행이 2자리(`"11"`)로 섞여 온다. FE는 자릿수로 분기하지 않고 코드 → 지역 이름 표로 바꿔 이름으로 칠한다 (`fe:src/widgets/travel-map-google/lib/mapFills.ts`).
 - `partyMapOverview.country.regionCode`는 `"KR"` 고정, `provinces`는 2자리다.
 - `partyTripInRegion`은 없는 `regionCode`에도 에러 없이 `null`을 준다 (검증하지 않는다).
 

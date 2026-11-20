@@ -46,10 +46,10 @@ BE가 내는 에러 코드와 HTTP 상태, FE가 각각을 어떻게 다루는�
 | --- | --- | --- |
 | `INVALID_LOGIN_CODE` | 401 | 교환 코드가 없거나 만료·재사용 |
 | `INVALID_TOKEN` | 401 | refresh 토큰이 폐기·재사용·만료, `signupToken` 무효·만료, 소셜 제공자 토큰 검증 실패 |
-| `USER_NOT_FOUND` | 401 | refresh의 사용자가 없음 |
+| `USER_NOT_FOUND` | 401 | refresh의 사용자가 없음. 탈퇴는 refresh 토큰을 먼저 지우므로 탈퇴 계정은 `INVALID_TOKEN`이 된다 |
 | `SIGNUP_ALREADY_COMPLETED` | 409 | 이미 가입된 소셜 계정으로 가입 시도 |
 | `VALIDATION_ERROR` | 400 | 닉네임 규칙 위반, 없는 프로필 이미지, 허용 안 된 이미지 형식 |
-| `EXTERNAL_API_ERROR` | 503 | 소셜 제공자와의 통신 실패 (토큰 직접 검증 로그인 `/api/auth/login/{provider}` 경로) |
+| `EXTERNAL_API_ERROR` | 503 | 카카오 사용자 정보 조회, 애플 공개키 조회 실패. 카카오 토큰 검증 단계의 통신 실패는 503이 아니라 401 `INVALID_TOKEN`이다 (`/api/auth/login/{provider}` 경로) |
 
 FE는 REST 4xx를 보고하지 않는다. 예외는 재발급 401 하나다 (강제 로그아웃 지점). 5xx와 네트워크 실패는 보고한다.
 

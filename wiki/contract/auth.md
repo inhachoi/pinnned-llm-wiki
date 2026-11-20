@@ -38,7 +38,7 @@ FE가 기대도 되는 로그인·토큰 규칙. 구현은 포인터만 남긴�
 ## 재발급 규칙 (rotation)
 
 - `POST /api/auth/refresh {refreshToken}` → access·refresh **둘 다** 새로 온다. 쓴 refresh는 즉시 폐기된다.
-- 이미 쓴 토큰·모르는 토큰·만료 토큰은 `401 INVALID_TOKEN`. 사용자가 탈퇴했으면 `401 USER_NOT_FOUND`.
+- 이미 쓴 토큰·모르는 토큰·만료 토큰은 `401 INVALID_TOKEN`. 탈퇴한 사용자도 `401 INVALID_TOKEN`이다(탈퇴가 refresh 토큰을 먼저 지운다, `be:user/service/AccountWithdrawalService.kt`). `USER_NOT_FOUND`는 탈퇴 절차 밖에서 사용자 행이 사라졌을 때만 난다.
 - refresh 토큰은 로그인마다 따로 저장된다. 한 기기의 로그아웃·재발급이 다른 기기 세션을 끊지 않는다.
 - `POST /api/auth/logout {refreshToken}` → `204`. 모르는 토큰이어도 204다 (멱등).
 
@@ -63,7 +63,7 @@ FE가 기대도 되는 로그인·토큰 규칙. 구현은 포인터만 남긴�
 - 동시 401에 대한 재발급 중복 방지는 **한 JS 컨텍스트 안에서만** 된다. 탭 두 개가 같은 refresh 토큰으로 동시에 재발급하면 늦은 쪽이 `INVALID_TOKEN`을 받아 그 탭이 토큰을 지운다 (저장소는 탭 간 공유).
 - 교환 코드를 두 번 보내면 (이중 마운트, 새로고침) 두 번째는 401이다.
 - 재발급은 401일 때만, refresh 토큰이 있을 때만 탄다. 200 + `UNAUTHENTICATED`를 받고 재발급을 기대하면 안 된다.
-- 다른 기기에서 탈퇴한 계정은 access 토큰이 만료될 때까지 200 + `UNAUTHENTICATED`를 받고, 만료 후 재발급에서 `USER_NOT_FOUND`로 끝난다.
+- 다른 기기에서 탈퇴한 계정은 access 토큰이 만료될 때까지 200 + `UNAUTHENTICATED`를 받고, 만료 후 재발급에서 `401 INVALID_TOKEN`으로 끝난다. FE는 refresh의 401을 코드와 무관하게 같은 방식으로 처리한다.
 - `/api/auth/**` 에러 본문은 `{code, message}`지만, 요청 본문 검증 실패(빈 `code` 등)는 `code` 없는 기본 400 본문이다. FE는 `code` 없음을 견뎌야 한다.
 - 가입 요청의 `nickname`은 6자 이하, `profileImage`는 필수다. `be:docs/authentication.md`의 가입 예시에는 `profileImage`가 빠져 있다 (문서가 낡음, 코드가 기준).
 - BE CORS는 허용 origin 2개와 헤더 `Authorization`·`Content-Type`만 연다. FE는 운영에서 `/graphql`·`/api/**`를 같은 origin 프록시로 보내 CORS를 피한다. 커스텀 헤더를 직접 호출에 붙이면 막힌다.
