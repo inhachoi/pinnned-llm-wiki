@@ -44,8 +44,19 @@ const REGISTERS = new Set([
   "wiki/log.md",
   "wiki/glossary.md",
 ])
+const isIndex = (path) => rel(path).endsWith("/index.md")
 const maxLines = (path) =>
-  rel(path) === "wiki/index.md" ? 150 : REGISTERS.has(rel(path)) ? 600 : 100
+  isIndex(path) ? 150 : REGISTERS.has(rel(path)) ? 600 : 100
+
+/** 그 쪽을 등록해야 하는 목차: 같은 폴더의 index.md(자기 자신이면 한 단계 위), 없으면 위로 올라간다 */
+function nearestIndex(path) {
+  let dir = isIndex(path) ? dirname(dirname(path)) : dirname(path)
+  for (;;) {
+    const candidate = resolve(dir, "index.md")
+    if (existsSync(candidate) || candidate === indexPath) return candidate
+    dir = dirname(dir)
+  }
+}
 
 const STATUSES = new Set(["current", "draft", "superseded"])
 const OWNERS = new Set(["product", "design", "fe", "be", "ops"])
@@ -113,8 +124,13 @@ for (const path of wikiPages) {
   const lines = text.split("\n").length
   if (lines > maxLines(path))
     fail(path, `${lines}줄 — 상한 ${maxLines(path)}줄 초과`)
-  if (path !== indexPath && !index.includes(rel(path).replace(/^wiki\//, "")))
-    fail(path, "index.md에 등록되지 않음")
+  // 목차는 트리다: 쪽은 가장 가까운 상위 index.md에, 하위 index.md는 그 위 index.md에 등록돼야 한다
+  if (path !== indexPath) {
+    const parent = nearestIndex(path)
+    const link = relative(dirname(parent), path).replaceAll("\\", "/")
+    if (!read(parent).includes(link))
+      fail(path, `${rel(parent)}에 등록되지 않음`)
+  }
   if (meta?.status === "current" && !REGISTERS.has(rel(path)))
     for (const term of retired)
       if (text.includes(term)) fail(path, `폐기 용어 "${term}"`)
