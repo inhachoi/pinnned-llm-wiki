@@ -57,7 +57,7 @@ verified: 2026-11-20
 
 - 길이 상한: `product/`·`contract/`·`design/`·`system/` 100줄, `index.md` 150줄.
 - `contract/` 쪽은 끝에 `## 확인 방법`(재검증 명령 또는 코드 위치).
-- ID 불변: `SPEC-nn` = `raw/figma/` 파일, `Qnn` = 열린 질문, `D-nnn` = 결정. PR은 `fe#n`(mash-up-kr/Pinnned), `be#n`(mash-up-kr/udumeoli-spring).
+- ID 불변: `SPEC-nn` = `raw/figma/` 파일, `meeting:YYYY-MM-DD` = `raw/meetings/` 파일, `notion:이름` = `wiki/system/notion-sources.md` 표의 행, `Qnn` = 열린 질문, `D-nnn` = 결정. PR은 `fe#n`(mash-up-kr/Pinnned), `be#n`(mash-up-kr/udumeoli-spring).
 - 새 쪽은 `index.md` 표에 경로·키워드와 함께 등록한다.
 
 ## 수집

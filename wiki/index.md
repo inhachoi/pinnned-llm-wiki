@@ -2,7 +2,7 @@
 status: current
 owner: ops
 sources: []
-verified: 2026-11-20
+verified: 2026-11-22
 ---
 
 # 목차
@@ -14,7 +14,7 @@ verified: 2026-11-20
 | 쪽 | 읽을 때 | 내용 |
 | --- | --- | --- |
 | [decisions.md](decisions.md) | 제품 동작을 바꿀 때 | 확정 결정과 이유 (D-001~). 의도의 최종 근거 |
-| [open-questions.md](open-questions.md) | 정책이 불분명할 때 | 미확정·충돌 (Q01~Q18). 열린 것은 확정처럼 구현 금지 |
+| [open-questions.md](open-questions.md) | 정책이 불분명할 때 | 미확정·충돌 (Q01~Q24). 열린 것은 확정처럼 구현 금지 |
 | [glossary.md](glossary.md) | 용어가 낯설 때 | 팟, 팟장, 초대코드, 티켓, 기록, 키워드, 핀, 슬롯, 리캡 |
 
 ## 제품 규칙
@@ -46,6 +46,7 @@ BE에서 제품 동작(`tripphoto/trip` `tripphoto/party` `tripphoto/user`)을 �
 | --- | --- | --- |
 | [system/error-pipeline.md](system/error-pipeline.md) | `shared/api/error-reporter` `shared/server` `.github/weekly-triage` | 에러 수집 → 노션 QA → 주간 트리아지 → 머지 후 정리 |
 | [system/analytics.md](system/analytics.md) | `shared/api/analytics*.ts` `shared/api/google-analytics.ts` `shared/api/remote-config.ts` `entities/travel-pot/lib/invite-tracking.ts` `trackEvent` 호출부 | 이벤트 이름·시점, GA4, signup_completed, 초대 공유·열림, app_platform, 초대코드 미전송, Firebase, Remote Config, A/B 테스트 |
+| [system/notion-sources.md](system/notion-sources.md) | 노션 문서를 근거로 쓰려 할 때 | 근거로 쓰는 쪽, 이유만 참고하는 쪽, 낡은 API 가이드, `notion:` ID |
 | [system/infra.md](system/infra.md) | 배포·호스팅·봇 | FE·BE·썸네일·봇이 도는 곳 |
 | [design/figma-baseline.md](design/figma-baseline.md) | Figma URL을 받았을 때 | 최종 페이지 하나만 기준, 영역별 노드, 미수집 패널, 레거시 디자인 시스템 |
 | [log.md](log.md) | 위키를 갱신할 때 | 수집·수정 기록 |
@@ -74,3 +75,7 @@ BE에서 제품 동작(`tripphoto/trip` `tripphoto/party` `tripphoto/user`)을 �
 | SPEC-16 | [my-page](../raw/figma/SPEC-16-my-page.md) |
 | SPEC-17 | [pot-settings](../raw/figma/SPEC-17-pot-settings.md) |
 | SPEC-18 | [loading](../raw/figma/SPEC-18-loading.md) |
+
+## 회의 결정 사본 (`raw/meetings`, 구속력 없음)
+
+`meeting:YYYY-MM-DD`는 `raw/meetings/YYYY-MM-DD.md`다. 노션 회의록에서 세 조건을 통과한 결정, 결정의 이유로 쓰는 배경, 범위가 불분명해 질문으로 남긴 미확정을 구분해 옮긴 것이고 원문은 레포에 없다. 정리본의 인용을 확인할 때만 연다.

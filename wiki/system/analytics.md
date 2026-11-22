@@ -1,7 +1,7 @@
 ---
 status: current
 owner: fe
-sources: [fe#154, fe#166, fe#175, fe:src/shared/api/analytics.ts, fe:src/shared/api/google-analytics.ts, fe:src/shared/api/analytics-runtime.tsx, fe:src/shared/api/remote-config.ts, fe:src/shared/api/firebase.ts, fe:src/entities/travel-pot/lib/invite-tracking.ts]
+sources: [fe#154, fe#166, fe#175, fe:src/shared/api/analytics.ts, fe:src/shared/api/google-analytics.ts, fe:src/shared/api/analytics-runtime.tsx, fe:src/shared/api/remote-config.ts, fe:src/shared/api/firebase.ts, fe:src/entities/travel-pot/lib/invite-tracking.ts, notion:privacy-policy, notion:remote-config-server, be:src/main/kotlin/udumeoli/tripphoto/config/remote/RemoteConfigClient.kt]
 verified: 2026-11-22
 ---
 
@@ -34,6 +34,9 @@ verified: 2026-11-22
 - 자체 API로는 경로를 pathname만 보내고 쿼리는 뺀다. UTM 3종(`utm_source`·`utm_medium`·`utm_campaign`)만 따로 뽑아 보낸다. referrer는 origin만 보낸다 (fe#154, `fe:src/shared/api/analytics.ts`).
 - referrer를 origin으로 자르는 이유는 인증 쿼리를 빼기 위해서다 (`fe:src/shared/api/google-analytics.ts`).
 - 사용자 계정 ID는 보내지 않는다. 식별자는 브라우저 익명 ID와 탭 세션 ID뿐이다 (`fe:src/shared/api/analytics.ts`).
+- 분석 이벤트에 이메일, 이름, 원본 userId, access·refresh 토큰, 원본 응답 객체, 이미지 URL을 넣지 않는다. 분석 식별자를 계정 userId와 결합하지 않는다 (notion:privacy-policy 2조)
+- 자체 분석 이벤트의 보관 기간은 발생일로부터 90일로 약속돼 있다. 분석 서버의 보관 기간을 늘리려면 방침부터 바꾼다 (notion:privacy-policy 2조. 분석 서버 설정은 확인하지 않았다)
+- 새 이벤트나 데이터를 보내는 외부 서비스를 추가하면 개인정보처리방침의 수집 이벤트 목록(2조)과 외부 서비스 표(5조)도 갱신 대상이다. 현재 방침은 코드보다 뒤처져 있다 ([Q22](../open-questions.md#q22))
 - 전송은 fire-and-forget이다. 실패·타임아웃·저장소 차단이 서비스 동작에 영향을 주면 안 된다 (fe#154).
 - 두 경로 모두 **운영 빌드에서만** 보낸다. 로컬 기록이 운영 지표에 섞이지 않게 한 것이다 (fe#175).
 
@@ -51,6 +54,8 @@ verified: 2026-11-22
 - Firebase Analytics와 수동 gtag 로더를 함께 쓰지 않는다. 함께 쓰면 `page_view`가 두 번 찍힌다 (`fe:src/shared/api/google-analytics.ts`).
 - Analytics 초기화는 한 번만 한다. 경로 변경마다 다시 부르면 SDK가 예외를 던진다 (`fe:src/shared/api/google-analytics.ts`).
 - **초기화 순서는 Analytics → Remote Config로 고정이다.** 순서가 바뀌면 실험 배정이 Analytics 사용자 속성에 기록되지 않는다 (fe#166).
+- BE는 Remote Config의 서버 템플릿을 읽는다. 웹이 쓰는 클라이언트 템플릿과 별개라, 서버가 읽을 키는 서버 템플릿에 따로 만들어야 한다 (`be:src/main/kotlin/udumeoli/tripphoto/config/remote/RemoteConfigClient.kt`)
+- 서버는 userId로 실험 그룹을 나눈다. 웹과 기준이 달라 같은 사용자가 웹과 서버에서 다른 그룹일 수 있다 (notion:remote-config-server, 서버 쪽은 `RemoteConfigClient.kt`)
 - Remote Config 값은 SSR과 하이드레이션에서 기본값이고, 활성화 뒤 원격 값으로 다시 렌더된다 (fe#166).
 - 미설정·조회 전·키 없음은 기본값이다. 조회가 실패하면 직전에 활성화된 값이 있으면 그 값, 없으면 기본값이다 (`fe:src/shared/api/remote-config.ts`).
 - Remote Config 조회 간격은 1시간이다. 실험 값 변경은 그 안에 반영되지 않을 수 있다 (`fe:src/shared/api/remote-config.ts`).

@@ -1,8 +1,8 @@
 ---
 status: current
 owner: product
-sources: [SPEC-16]
-verified: 2026-11-20
+sources: [SPEC-16, notion:privacy-policy]
+verified: 2026-11-22
 ---
 
 # 마이페이지
@@ -43,6 +43,8 @@ verified: 2026-11-20
 ### 계정 삭제
 
 - [계정 삭제]를 누르면 재확인 팝업을 보인다 (SPEC-16 §7)
+- 계정 삭제는 현재 유예 기간 없이 즉시 처리된다(`be:.../user/service/AccountWithdrawalService.kt`). 방침 7조는 사용자, 소셜 계정 연결, refresh 토큰, 업로드한 이미지, 그 사용자의 여행 기록을 삭제한다고 약속한다. 삭제 뒤 복원 기능을 넣으려면 방침과 맞는지 먼저 확인한다 (notion:privacy-policy 7조)
+- 피드백은 별점·본문·사용자 ID·앱 버전·기기 정보·전송 시각을 저장하고, 계정 삭제가 피드백 행을 지우지 않는다. 방침에 피드백 항목이 없다 ([Q21](../open-questions.md#q21))
 - 팝업의 [계정 삭제]는 삭제 후 스플래시 화면으로 간다. [취소]는 팝업을 닫고 마이페이지를 유지한다 (SPEC-16 §7-1)
 - 삭제 시 해당 유저가 업로드한 사진을 삭제한다 (SPEC-16 §7-1)
 - 삭제 시 해당 유저가 속한 모든 여행팟에서 탈퇴 처리하고 그 자리는 공석으로 바꾼다. 여행팟 자체는 유지한다 (SPEC-16 §7-1)
@@ -63,4 +65,5 @@ verified: 2026-11-20
 
 - [Q15](../open-questions.md#q15) 이용약관·개인정보처리방침 노션 URL 미제공
 - [Q16](../open-questions.md#q16) 삭제자가 팟장·마지막 멤버일 때 처리
+- [Q21](../open-questions.md#q21) 피드백 데이터의 방침 누락과 계정 삭제 뒤 잔존
 

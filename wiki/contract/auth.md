@@ -1,8 +1,8 @@
 ---
 status: current
 owner: be
-sources: [be:docs/authentication.md, be:src/main/kotlin/udumeoli/tripphoto/auth, be:src/main/resources/application.yml, fe:src/shared/api, fe:src/features/auth]
-verified: 2026-11-20
+sources: [be:docs/authentication.md, be:src/main/kotlin/udumeoli/tripphoto/auth, be:src/main/resources/application.yml, fe:src/shared/api, fe:src/features/auth, notion:privacy-policy]
+verified: 2026-11-22
 ---
 
 # 인증 계약
@@ -21,9 +21,10 @@ FE가 기대도 되는 로그인·토큰 규칙. 구현은 포인터만 남긴�
 
 - `frontendRedirect`는 BE 화이트리스트(`auth.allowed-frontend-callback-urls`)와 **문자열이 정확히 같을 때만** 적용된다. 다르면 에러 없이 기본 콜백으로 간다.
 - 1회용 코드는 2분, 1회. BE 메모리(단일 인스턴스 캐시)에만 있어 BE 재시작 시 사라진다. 재사용·만료는 `401 INVALID_LOGIN_CODE`.
+- 소셜 인증이 실패하면 BE는 콜백 URL에 `code` 대신 `?error=oauth_login_failed`를 붙여 302 한다. FE는 `error`가 있으면 교환을 호출하지 않는다 (`be:.../auth/web/OAuth2LoginHandlers.kt`).
 - 소셜 제공자의 닉네임은 쓰지 않는다. 신규 사용자는 닉네임을 직접 입력한다.
 - 토큰은 쿠키가 아니라 **JSON 본문**으로 온다. FE가 직접 보관하고 `Authorization: Bearer <accessToken>`으로 보낸다.
-- 웹은 위 리다이렉트 흐름만 쓴다. 소셜 토큰을 직접 넘기는 `POST /api/auth/login/{kakao|google|apple}`도 있으며 응답 형태는 교환과 같다. FE 레포에는 호출부가 없다.
+- 웹은 위 리다이렉트 흐름만 쓴다. 소셜 토큰을 직접 넘기는 `POST /api/auth/login/{kakao|google|apple}`도 있으며 응답 형태는 교환과 같다. 네이티브 SDK가 받은 소셜 토큰을 넘기는 앱용 경로이고 웹은 쓰지 않는다.
 - 가입 전 프로필 사진 업로드는 토큰이 없으므로 REST `POST /api/auth/signup/image-upload-url {signupToken, contentType}`을 쓴다 ([images.md](images.md)).
 
 ## 토큰 수명
@@ -40,6 +41,7 @@ FE가 기대도 되는 로그인·토큰 규칙. 구현은 포인터만 남긴�
 - `POST /api/auth/refresh {refreshToken}` → access·refresh **둘 다** 새로 온다. 쓴 refresh는 즉시 폐기된다.
 - 이미 쓴 토큰·모르는 토큰·만료 토큰은 `401 INVALID_TOKEN`. 탈퇴한 사용자도 `401 INVALID_TOKEN`이다(탈퇴가 refresh 토큰을 먼저 지운다, `be:user/service/AccountWithdrawalService.kt`). `USER_NOT_FOUND`는 탈퇴 절차 밖에서 사용자 행이 사라졌을 때만 난다.
 - refresh 토큰은 로그인마다 따로 저장된다. 한 기기의 로그아웃·재발급이 다른 기기 세션을 끊지 않는다.
+- refresh 토큰은 해시로만 저장한다. 개인정보처리방침 10조가 약속한 내용이다 (notion:privacy-policy).
 - `POST /api/auth/logout {refreshToken}` → `204`. 모르는 토큰이어도 204다 (멱등).
 
 ## 200과 401의 구분
@@ -62,10 +64,11 @@ FE가 기대도 되는 로그인·토큰 규칙. 구현은 포인터만 남긴�
 
 - 동시 401에 대한 재발급 중복 방지는 **한 JS 컨텍스트 안에서만** 된다. 탭 두 개가 같은 refresh 토큰으로 동시에 재발급하면 늦은 쪽이 `INVALID_TOKEN`을 받아 그 탭이 토큰을 지운다 (저장소는 탭 간 공유).
 - 교환 코드를 두 번 보내면 (이중 마운트, 새로고침) 두 번째는 401이다.
+- 가입 화면에서 10분을 넘기면 `signupToken`이 만료돼 가입과 가입 전 업로드가 `401 INVALID_TOKEN`이 된다. 복구 방법은 소셜 로그인부터 다시 하는 것뿐이다.
 - 재발급은 401일 때만, refresh 토큰이 있을 때만 탄다. 200 + `UNAUTHENTICATED`를 받고 재발급을 기대하면 안 된다.
 - 다른 기기에서 탈퇴한 계정은 access 토큰이 만료될 때까지 200 + `UNAUTHENTICATED`를 받고, 만료 후 재발급에서 `401 INVALID_TOKEN`으로 끝난다. FE는 refresh의 401을 코드와 무관하게 같은 방식으로 처리한다.
 - `/api/auth/**` 에러 본문은 `{code, message}`지만, 요청 본문 검증 실패(빈 `code` 등)는 `code` 없는 기본 400 본문이다. FE는 `code` 없음을 견뎌야 한다.
-- 가입 요청의 `nickname`은 6자 이하, `profileImage`는 필수다. `be:docs/authentication.md`의 가입 예시에는 `profileImage`가 빠져 있다 (문서가 낡음, 코드가 기준).
+- 가입 요청의 `nickname`은 앞뒤 공백을 뺀 1~6자다(가운데 공백은 길이에 포함, `be:.../user/entity/Nickname.kt`). `profileImage`는 필수이고 프리셋 코드 1~4 또는 업로드한 `imageId`다. `be:docs/authentication.md`의 가입 예시에는 `profileImage`가 빠져 있다 (문서가 낡음, 코드가 기준).
 - BE CORS는 허용 origin 2개와 헤더 `Authorization`·`Content-Type`만 연다. FE는 운영에서 `/graphql`·`/api/**`를 같은 origin 프록시로 보내 CORS를 피한다. 커스텀 헤더를 직접 호출에 붙이면 막힌다.
 - SSR에는 토큰이 없다. 인증이 필요한 호출은 브라우저에서만 한다.
 

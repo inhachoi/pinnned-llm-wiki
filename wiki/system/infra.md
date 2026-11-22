@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: ops
-sources: [fe:.github/workflows/deploy.yml, fe:vite.config.ts, be:.github/workflows/deploy.yml, be:docker-compose.yml, be:infra/terraform/README.md, be:src/main/resources/application-dev.yml, thumbnail:.github/workflows/deploy.yml]
-verified: 2026-11-20
+sources: [fe:.github/workflows/deploy.yml, fe:vite.config.ts, be:.github/workflows/deploy.yml, be:docker-compose.yml, be:infra/terraform/README.md, be:src/main/resources/application-dev.yml, thumbnail:.github/workflows/deploy.yml, notion:be-infra-guide]
+verified: 2026-11-22
 ---
 
 # 인프라 배치
@@ -35,6 +35,8 @@ verified: 2026-11-20
 - API 서버가 1대라는 전제에 기대는 코드가 있다 (메모리 캐시 기반 교환 코드·시도 제한). 서버를 늘리려면 이 둘부터 옮겨야 한다.
 - FE 빌드는 CI에서 Vercel 프리셋을 명시해야 한다. 빠지면 SSR 함수가 만들어지지 않아 404가 난다.
 - 프록시 대상 API 주소는 FE 빌드 설정에 박혀 있다. API 도메인이 바뀌면 FE를 다시 배포해야 한다.
+- API 서버는 네이티브 이미지로 배포한다. 인프라 가이드는 VM 메모리가 작아 메모리 부족이 흔하다고 적지만 네이티브를 고른 이유를 명시하지 않는다 — 확인 필요 (notion:be-infra-guide)
+- JVM에서는 되는데 네이티브 이미지에서만 클래스 조회·리플렉션 에러가 나면 네이티브 힌트 등록이 빠진 것이다. 로컬 테스트 통과가 배포 성공을 보장하지 않는다 (`be:src/main/kotlin/udumeoli/tripphoto/config/ApplicationNativeHints.kt`)
 - 비밀값은 API 서버 VM의 환경 파일과 각 레포의 GitHub Actions 시크릿, Vercel 환경변수에만 있다. 레포에는 이름만 있다.
 - API 서버 배포 후 헬스체크는 `/actuator/health`다.
 

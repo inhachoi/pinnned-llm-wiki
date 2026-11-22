@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: be
-sources: [be:src/main/kotlin/udumeoli/tripphoto/image, be:src/main/kotlin/udumeoli/tripphoto/config/StorageProperties.kt, be:src/main/resources/graphql/schema.graphqls, thumbnail:main.go, fe:src/shared/api/image-upload.ts]
-verified: 2026-11-20
+sources: [be:src/main/kotlin/udumeoli/tripphoto/image, be:src/main/kotlin/udumeoli/tripphoto/config/StorageProperties.kt, be:src/main/resources/graphql/schema.graphqls, thumbnail:main.go, fe:src/shared/api/image-upload.ts, notion:image-encryption, notion:auth-guide, notion:privacy-policy]
+verified: 2026-11-22
 ---
 
 # 이미지 업로드 계약
@@ -22,9 +22,10 @@ verified: 2026-11-20
 - 허용 `contentType`은 `image/jpeg`, `image/png`, `image/webp`뿐이다. 그 외는 `VALIDATION_ERROR` (REST 쪽은 400).
 - PUT에는 **발급 때 서명된 헤더를 그대로** 실어야 한다: `Content-Type`(발급 요청과 같은 값) + `encryptionHeaders`의 3개 헤더 전부. 하나라도 빠지거나 다르면 서명 불일치로 스토리지가 거부한다.
 - `encryptionHeaders`는 이미지마다 다른 암호화 키(SSE-C)다. FE는 값을 해석하지 않고 그대로 전달하며, 저장하거나 로그·에러 리포트에 남기지 않는다.
+- 이미지마다 다른 키를 쓰는 이유: 스토리지 기본 암호화만으로는 클라우드 콘솔에서 관리자가 사진을 내려받아 볼 수 있다 (notion:image-encryption). 마스터 키는 서버 환경변수에 있다.
 - `uploadUrl`은 기본 5분 뒤 만료된다 (스키마 주석은 "협의 중"). 발급 직후 올린다.
 - `imageId`는 발급 시점에 이미 생긴다. BE는 실제로 PUT이 끝났는지 확인하지 않는다. `IMAGE_NOT_UPLOADED` 코드는 던지는 곳이 없다. 업로드 성공 확인은 FE 책임이다.
-- 기록 1건에 사진 1장. 교체되어 연결이 끊긴 사진은 BE가 이미지 행을 지운다 (스토리지 객체까지 지우는지는 확인 필요).
+- 기록 1건에 사진 1장. 교체되어 연결이 끊긴 사진은 BE가 이미지 행을 지운다. 스토리지 객체는 지우지 않는다(`be:.../image/storage/S3StorageAdapter.kt`에 삭제 기능이 없다). 개인정보처리방침 7조의 "저장소에서 삭제"와 어긋난다 ([Q19](../open-questions.md#q19)).
 - 썸네일 요청은 기록 저장 트랜잭션이 커밋된 뒤 BE가 썸네일 서비스에 보낸다. 실패해도 기록 저장은 성공이다.
 
 ## 이미지 URL
@@ -37,6 +38,7 @@ verified: 2026-11-20
 ## 썸네일 서비스 연동 (BE ↔ thumbnail)
 
 - BE → `POST {THUMBNAIL_SERVER_URL}/thumbnail` 본문 `{id, image_url}`. 응답은 `202` (큐 적재). 큐가 가득 차면 `503`.
+- 썸네일 서비스는 큐를 워커 하나가 한 건씩 처리한다. 요청이 몰려도 처리량은 그대로라 완료 시점을 보장하지 않는다 (`thumbnail:main.go`).
 - 썸네일 서비스는 같은 DB의 이미지 행을 읽어 원본을 내려받고, 최대 480x480으로 줄여 올린 뒤 그 행의 썸네일 URL을 갱신한다.
 - 놓친 건은 썸네일 서비스가 5분마다 DB에서 찾아 다시 시도한다. 한 번에 50건까지이고, 같은 건은 3번 실패하면 서비스가 재시작될 때까지 건너뛴다 (`thumbnail:main.go`). BE는 재시도하지 않고 경고 로그만 남긴다.
 - `THUMBNAIL_SERVER_URL`이 비어 있으면 BE는 요청 자체를 건너뛴다.
@@ -52,6 +54,7 @@ verified: 2026-11-20
 - `/stream/...` 경로가 어느 프로세스로 라우팅되는지는 서버의 nginx 설정에 있고 레포에 없다 — 확인 필요 ([infra.md](../system/infra.md)).
 - 스토리지 버킷의 CORS·공개 설정, 운영 `upload-url-ttl` 재정의 여부는 레포에서 확인되지 않는다 — 확인 필요.
 - 원본 크기 상한: `application.yml`에 `max-upload-size: 10MB`가 있으나 presigned PUT에 강제되는지는 확인 필요.
+- PUT에 `Authorization` 헤더를 붙이지 않는다. 발급된 URL에 인증이 들어 있다. 본문은 FormData가 아니라 파일 바이너리 그대로다 (notion:auth-guide. 헤더를 붙였을 때의 스토리지 동작은 확인하지 않았다).
 
 ## 확인 방법
 
