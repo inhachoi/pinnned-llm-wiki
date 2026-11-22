@@ -43,7 +43,7 @@ verified: 2026-11-20
 | 쪽 | 읽을 때 | 내용 |
 | --- | --- | --- |
 | [system/error-pipeline.md](system/error-pipeline.md) | `shared/api/error-reporter` `shared/server` `.github/weekly-triage` | 에러 수집 → 노션 QA → 주간 트리아지 → 머지 후 정리 |
-| [system/analytics.md](system/analytics.md) | `shared/api/analytics.ts` `shared/api/google-analytics.ts` `entities/travel-pot/lib/invite-tracking.ts` | GA4, 이벤트 이름, signup_completed, 초대 공유·열림, app_platform |
+| [system/analytics.md](system/analytics.md) | `shared/api/analytics*.ts` `shared/api/google-analytics.ts` `shared/api/remote-config.ts` `entities/travel-pot/lib/invite-tracking.ts` `trackEvent` 호출부 | 이벤트 이름·시점, GA4, signup_completed, 초대 공유·열림, app_platform, 초대코드 미전송, Firebase, Remote Config, A/B 테스트 |
 | [system/infra.md](system/infra.md) | 배포·호스팅·봇 | FE·BE·썸네일·봇이 도는 곳 |
 | [design/figma-baseline.md](design/figma-baseline.md) | Figma URL을 받았을 때 | 최종 페이지 하나만 기준, 영역별 노드, 미수집 패널, 레거시 디자인 시스템 |
 | [log.md](log.md) | 위키를 갱신할 때 | 수집·수정 기록 |
