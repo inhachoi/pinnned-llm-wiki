@@ -28,5 +28,6 @@ wiki/               정리본
   log.md            수집·수정 기록
 AGENTS.md           규칙
 scripts/lint.mjs    점검 스크립트
+scripts/notion-fetch.mjs  주간 수집용 노션 회의록 내려받기 (원문은 레포에 넣지 않음)
 .github/ingest/     주간 수집 절차
 ```

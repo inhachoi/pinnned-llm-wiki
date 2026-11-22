@@ -1,18 +1,19 @@
 name: Weekly Ingest
 
-# 매주 월요일 10:00 KST — 지난주에 머지된 PR과 raw/의 새 파일을 읽어 위키를 갱신한다.
+# 매주 금요일 06:00 KST — 지난 금요일부터 머지된 PR과 노션 회의록, raw/의 새 파일을 읽어 위키를 갱신한다.
+# 격주 목요일 밤 회의 결정이 금요일 아침 작업 전에 반영되게 하는 시각이다. 회의록을 그 뒤에 정리했으면 수동 실행한다.
 # 절차는 .github/ingest/PROMPT.md, 규칙은 AGENTS.md. 사람 승인 없이 점검을 통과하면 main에 반영한다.
-# CLAUDE_CODE_OAUTH_TOKEN 시크릿이 없으면 아무것도 하지 않고 끝난다.
+# CLAUDE_CODE_OAUTH_TOKEN 시크릿이 없으면 아무것도 하지 않고 끝난다. NOTION_TOKEN이 없으면 노션만 건너뛴다.
 on:
   schedule:
-    - cron: "0 1 * * 1"
+    - cron: "0 21 * * 4"
   workflow_dispatch:
     inputs:
       since:
-        description: "대상 시작 (YYYY-MM-DD). 비우면 지난주 월요일"
+        description: "대상 시작 (YYYY-MM-DD). 비우면 지난 금요일"
         required: false
       until:
-        description: "대상 끝, 배타 (YYYY-MM-DD). 비우면 이번주 월요일"
+        description: "대상 끝 (YYYY-MM-DD). 비우면 오늘"
         required: false
 
 permissions:
@@ -59,11 +60,19 @@ jobs:
         run: |
           set -euo pipefail
           export TZ=Asia/Seoul
-          this_monday=$(date -d "$(date +%Y-%m-%d) -$(( $(date +%u) - 1 )) days" +%Y-%m-%d)
-          last_monday=$(date -d "$this_monday -7 days" +%Y-%m-%d)
-          echo "since=${INPUT_SINCE:-$last_monday}" >> "$GITHUB_OUTPUT"
-          echo "until=${INPUT_UNTIL:-$this_monday}" >> "$GITHUB_OUTPUT"
+          # 가장 최근 금요일(오늘이 금요일이면 오늘)에서 7일 전부터 오늘까지. 경계일은 양쪽 실행에 겹쳐 들어가고 수집이 중복을 거른다.
+          this_friday=$(date -d "$(date +%Y-%m-%d) -$(( ($(date +%u) + 2) % 7 )) days" +%Y-%m-%d)
+          last_friday=$(date -d "$this_friday -7 days" +%Y-%m-%d)
+          echo "since=${INPUT_SINCE:-$last_friday}" >> "$GITHUB_OUTPUT"
+          echo "until=${INPUT_UNTIL:-$(date +%Y-%m-%d)}" >> "$GITHUB_OUTPUT"
           echo "today=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      # 노션 토큰은 이 단계에만 준다. 뒤의 에이전트 단계는 내려받은 파일만 읽는다.
+      - name: Fetch Notion meeting notes
+        if: steps.gate.outputs.run == 'true'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/notion-fetch.mjs --since "${{ steps.period.outputs.since }}" --until "${{ steps.period.outputs.until }}"
 
       - name: Configure git identity
         if: steps.gate.outputs.run == 'true'
