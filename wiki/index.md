@@ -7,7 +7,7 @@ verified: 2026-11-20
 
 # 목차
 
-바꾸는 코드 경로나 키워드로 쪽을 찾아 1~3쪽만 연다. 규칙은 [AGENTS.md](../AGENTS.md).
+바꾸는 코드 경로나 키워드로 해당하는 쪽만 골라 연다. 전체를 읽지 않는다. 규칙은 [AGENTS.md](../AGENTS.md).
 
 ## 항상 해당
 
@@ -31,12 +31,14 @@ verified: 2026-11-20
 
 ## FE↔BE 계약
 
-| 쪽 | FE 경로 | 키워드 |
-| --- | --- | --- |
-| [contract/auth.md](contract/auth.md) | `shared/api/auth-fetch.ts` `shared/api/token-*.ts` `features/auth` | 토큰 수명, refresh 1회용, 200 vs 401, 강제 로그아웃, 로그인 코드 교환 |
-| [contract/errors.md](contract/errors.md) | `shared/api/client.ts` `shared/api/error-reporter` | GraphQL 에러 코드, UNAUTHENTICATED, FORBIDDEN, PARTY_FULL, 스키마에만 있는 코드 |
-| [contract/regions.md](contract/regions.md) | `entities/region` | regionCode, 2자리·5자리, 광역시, 세종, REGION_NOT_FOUND |
-| [contract/images.md](contract/images.md) | `entities/photo/api` | 업로드 URL, 암호화 헤더, 썸네일, contentType |
+BE에서 제품 동작(`tripphoto/trip` `tripphoto/party` `tripphoto/user`)을 바꿀 때는 위 "항상 해당"의 결정·열린 질문과 "제품 규칙" 표를 키워드로 찾는다.
+
+| 쪽 | FE 경로 | BE 경로 | 키워드 |
+| --- | --- | --- | --- |
+| [contract/auth.md](contract/auth.md) | `shared/api/auth-fetch.ts` `shared/api/token-*.ts` `features/auth` | `tripphoto/auth` `docs/authentication.md` | 토큰 수명, refresh 1회용, 200 vs 401, 강제 로그아웃, 로그인 코드 교환 |
+| [contract/errors.md](contract/errors.md) | `shared/api/client.ts` `shared/api/error-reporter` | `common/graphql` `schema.graphqls` | GraphQL 에러 코드, UNAUTHENTICATED, FORBIDDEN, PARTY_FULL, 스키마에만 있는 코드 |
+| [contract/regions.md](contract/regions.md) | `entities/region` | `tripphoto/region` `db/migration` | regionCode, 2자리·5자리, 광역시, 세종, REGION_NOT_FOUND |
+| [contract/images.md](contract/images.md) | `entities/photo/api` | `tripphoto/image` `StorageProperties.kt` | 업로드 URL, 암호화 헤더, 썸네일, contentType |
 
 ## 시스템·디자인
 
