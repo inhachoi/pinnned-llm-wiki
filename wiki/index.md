@@ -2,7 +2,7 @@
 status: current
 owner: ops
 sources: []
-verified: 2026-11-22
+verified: 2026-11-27
 ---
 
 # 목차
@@ -14,7 +14,7 @@ verified: 2026-11-22
 | 쪽 | 읽을 때 | 내용 |
 | --- | --- | --- |
 | [decisions.md](decisions.md) | 제품 동작을 바꿀 때 | 확정 결정과 이유 (D-001~). 의도의 최종 근거 |
-| [open-questions.md](open-questions.md) | 정책이 불분명할 때 | 미확정·충돌 (Q01~Q24). 열린 것은 확정처럼 구현 금지 |
+| [open-questions.md](open-questions.md) | 정책이 불분명할 때 | 미확정·충돌 (Q01~Q26). 열린 것은 확정처럼 구현 금지 |
 | [glossary.md](glossary.md) | 용어가 낯설 때 | 팟, 팟장, 초대코드, 티켓, 기록, 키워드, 핀, 슬롯, 리캡 |
 
 ## 제품 규칙

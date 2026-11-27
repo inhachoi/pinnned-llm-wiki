@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: be
-sources: [be:src/main/kotlin/udumeoli/tripphoto/common/graphql, be:src/main/resources/graphql/schema.graphqls, be:src/main/kotlin/udumeoli/tripphoto/auth/service/AuthException.kt, fe:src/shared/api/error-reporter]
-verified: 2026-11-20
+sources: [be#43, be:src/main/kotlin/udumeoli/tripphoto/common/graphql, be:src/main/resources/graphql/schema.graphqls, be:src/main/kotlin/udumeoli/tripphoto/auth/service/AuthException.kt, fe:src/shared/api/error-reporter]
+verified: 2026-11-27
 ---
 
 # 에러 계약
@@ -11,10 +11,10 @@ BE가 내는 에러 코드와 HTTP 상태, FE가 각각을 어떻게 다루는�
 
 ## 규칙
 
-- GraphQL 도메인 에러는 **항상 HTTP 200**이고 `errors[].extensions.code`에 코드가 온다. FE는 `code`로만 분기한다. `message`(한국어 문장)와 `extensions.classification`은 계약이 아니다.
+- GraphQL 도메인 에러는 **항상 HTTP 200**이고 `errors[].extensions.code`에 코드가 온다. FE는 `code`로만 분기한다. `message`와 `extensions.classification`은 계약이 아니다. `message`는 요청의 `Accept-Language`(`en`·`en-US` 영어, 그 외·없음은 한국어)를 따르므로 문구로 분기하지 않는다 (be#43).
 - HTTP 401은 `/graphql`에서 "보낸 Bearer 토큰이 무효·만료"일 때만 난다. 본문은 GraphQL 형식이 아니라 `{code, message}`다.
 - 스키마에 안 맞는 쿼리는 200 + `classification: ValidationError`이고 `code`가 **없다**.
-- REST(`/api/auth/**`) 에러는 해당 HTTP 상태 + `{code, message}`. 요청 본문 검증 실패는 `code` 없는 기본 400 본문이다.
+- REST(`/api/auth/**`) 에러는 해당 HTTP 상태 + `{code, message}`. `message`도 `Accept-Language`를 따른다 (be#43). 요청 본문 검증 실패는 `code` 없는 기본 400 본문이다.
 
 ## GraphQL 코드
 
@@ -70,6 +70,8 @@ FE는 REST 4xx를 보고하지 않는다. 예외는 재발급 401 하나다 (강
 
 ```bash
 U=https://pinnnned.duckdns.org
+# Accept-Language: en → 영어 message, code는 그대로 (UNAUTHENTICATED)
+curl -s -X POST $U/graphql -H 'Content-Type: application/json' -H 'Accept-Language: en' -H 'User-Agent: pinnned-triage' -d '{"query":"{ partyTrips(partyId: \"1\") { id } }"}'
 # 200 + code
 curl -s -w '\n%{http_code}\n' -X POST $U/graphql -H 'Content-Type: application/json' -d '{"query":"{ partyTrips(partyId: \"1\") { id } }"}'
 # 스키마 위반 → 200, code 없음
@@ -78,6 +80,7 @@ curl -s -w '\n%{http_code}\n' -X POST $U/graphql -H 'Content-Type: application/j
 gh api "search/code?q=PARTY_FULL+repo:mash-up-kr/udumeoli-spring" --jq '.items[].path'
 ```
 
+- 오류 문구 번역: `be:src/main/kotlin/udumeoli/tripphoto/common/i18n/ApiMessageLocalizer.kt`, `be:docs/api-localization.md`
 - 코드 목록·분류 변환: `be:src/main/kotlin/udumeoli/tripphoto/common/graphql/GraphQlDomainException.kt`, `GraphQlDomainExceptionResolver.kt`
 - 멤버·owner 검사: `be:.../party/service/PartyQueryService.kt` (`requireMember`), `PartyCommandService.kt` (`requireOwner`)
 - 참여 제한: `be:.../party/service/PartyJoinService.kt`, `JoinPartyRateLimiter.kt`

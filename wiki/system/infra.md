@@ -47,6 +47,7 @@ verified: 2026-11-22
 | 주간 에러 트리아지, 머지 후 종결 | FE 레포 GitHub Actions | [error-pipeline.md](error-pipeline.md) |
 | PR 자동 코드 리뷰 | FE 레포 GitHub Actions (PR 열릴 때) | `fe:.github/workflows/gemini-code-review.yml` |
 | API 서버 로그 알림 | API 서버 프로세스 → Discord 웹훅 | `be:src/main/kotlin/udumeoli/tripphoto/config/logging/DiscordWebhookAppender.kt` |
+| KPI 이벤트 기록·Discord 알림·일일 리포트 | API 서버 (be#42로 추가) | `be:src/main/kotlin/udumeoli/tripphoto/kpi/`, `V9__create_kpi_event.sql` |
 | PR 자동 라벨·담당자 지정 | BE 레포 GitHub Actions | `be:.github/workflows/auto-label.yml`, `auto-assign.yml` |
 | 원격 설정 | Firebase Remote Config (FE·BE 모두 선택적으로 읽음) | `fe:src/shared/api/remote-config.ts`, `be:src/main/kotlin/udumeoli/tripphoto/config/remote/` |
 
@@ -59,5 +60,6 @@ verified: 2026-11-22
 - 웹 앱의 Vercel 프리뷰 배포 유무와 프리뷰가 어느 API 서버를 보는지. 워크플로는 운영 배포만 한다.
 - API 도메인의 DNS 제공 방식과 만료 관리 주체.
 - Discord 웹훅 알림이 운영에서 켜져 있는지 (환경변수가 비면 꺼진다).
+- KPI 알림이 보내는 이벤트 종류·채널 구성과 운영 활성 여부. be#42 본문이 비어 있어 코드 확인 필요.
 - 회의·알림용 팀 봇이 따로 있는지. 읽은 세 레포(FE·BE·thumbnail)에는 없다.
 - BE·thumbnail 레포의 모니터링·백업 구성. 레포에 없다.

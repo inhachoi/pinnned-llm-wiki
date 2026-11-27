@@ -1,8 +1,8 @@
 ---
 status: current
 owner: ops
-sources: [fe#173, fe#179, fe:src/shared/api/error-reporter, fe:src/shared/server, fe:.github/workflows/weekly-triage.yml, fe:.github/workflows/weekly-triage-merged.yml, fe:.github/weekly-triage/PROMPT.md]
-verified: 2026-11-20
+sources: [fe#173, fe#179, fe#184, fe:src/shared/api/error-reporter, fe:src/shared/server, fe:.github/workflows/weekly-triage.yml, fe:.github/workflows/weekly-triage-merged.yml, fe:.github/weekly-triage/PROMPT.md]
+verified: 2026-11-27
 ---
 
 # 운영 에러 파이프라인
@@ -67,5 +67,6 @@ verified: 2026-11-20
 - 노션에는 원자적 upsert가 없다. 같은 지문이 동시에 들어오면 행이 2개 생길 수 있다 (알려진 한계).
 - `진행`은 Todo / Done 둘뿐이다. 보류·노이즈·재발 같은 사정은 `원인 요약` 첫머리 꼬리표로만 구분한다. 꼬리표 문자열을 바꾸면 2번의 대상 필터가 깨진다.
 - 트리아지가 만든 PR이 CI를 타려면 기본 토큰이 아닌 별도 토큰으로 push해야 한다. 그 토큰은 체크아웃·라벨 생성·PR 생성에 모두 쓰이므로, 만료되면 체크아웃에서 실패해 PR 자체가 만들어지지 않는다.
+- 운영에 재현 요청을 보낼 때는 `User-Agent: pinnned-triage`를 붙인다. 붙이지 않으면 재현 요청의 5xx가 노션 QA에 새 오류 행으로 기록된다 (fe#184).
 - 수신 측 분당 상한은 함수 인스턴스별이다. 인스턴스가 여럿이면 전체 상한은 그만큼 늘어난다.
 - 우리 API 응답을 수집에서 빼는 것은 신호를 끄는 일이다. 빼기 전에 그 응답이 정상 흐름인 코드 경로와 BE가 그 응답을 내는 조건을 확인한다.

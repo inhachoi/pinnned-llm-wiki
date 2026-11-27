@@ -1,8 +1,8 @@
 ---
 status: current
 owner: be
-sources: [be:src/main/resources/db/migration/V1__init.sql, be:src/main/resources/db/migration/V7__flatten_trip_to_region_pin.sql, be:src/main/resources/graphql/schema.graphqls, be:src/main/kotlin/udumeoli/tripphoto/trip/service, fe:src/shared/api/region-codes.ts]
-verified: 2026-11-20
+sources: [be#43, be:src/main/resources/db/migration/V1__init.sql, be:src/main/resources/db/migration/V7__flatten_trip_to_region_pin.sql, be:src/main/resources/graphql/schema.graphqls, be:src/main/kotlin/udumeoli/tripphoto/trip/service, fe:src/shared/api/region-codes.ts]
+verified: 2026-11-27
 ---
 
 # 지역 코드 계약
@@ -44,6 +44,15 @@ verified: 2026-11-20
 - FE 매핑 표(`REGION_CODE_BY_NAME`)는 자동 생성 데이터다. 손으로 고치지 않는다. 지역 테이블이 바뀌면 BE 마이그레이션과 FE 표를 같이 바꿔야 한다.
 - 스키마 주석은 "광역시·도 2자리"라고 적지만 테이블에 도 코드는 없다. `createTrip`에 `"32"`를 보내면 `REGION_NOT_FOUND`다.
 
+## 지역명 언어 (be#43)
+
+- `Accept-Language`가 `en`·`en-US`면 영어, `ko`·`ko-KR`·없음·미지원이면 한국어 지역명이 온다.
+- `Query.regions`(지역 코드 전체 + `name`·`nameKo`·`nameEn`)가 있다. `name`만 요청 언어를 따르고 `nameKo`·`nameEn`은 고정이다. `Trip`·`VisitedRegion`·`MapCell`에 `regionName`이 추가됐다. 기존 `regionCode`·`TripKeyword` 값은 바뀌지 않는다.
+- `MapCell`의 `KR`은 `대한민국` / `South Korea`다.
+- 사용자가 쓴 팟 이름·닉네임·코멘트·피드백은 번역하지 않는다.
+- 화면 언어를 바꾸는 FE는 매 요청 헤더에 언어를 넣고, 지역명은 GeoJSON 이름 대신 API의 `name`·`regionName`을 써야 한다 (`be:docs/api-localization.md`). FE 적용 여부는 확인 필요.
+- 스키마 주석은 "regionCode는 GeoJSON `properties.code`와 같다"고 적지만 위 본문은 다르다고 적는다 ([Q25](../open-questions.md#q25)).
+
 ## 확인 방법
 
 ```bash
@@ -56,6 +65,7 @@ gh api repos/mash-up-kr/udumeoli-spring/contents/src/main/resources/db/migration
 gh api repos/mash-up-kr/udumeoli-spring/contents/src/main/resources/graphql/schema.graphqls --jq .content | base64 -d | grep -n -i regionCode
 ```
 
+- 지역명 사전·언어 선택: `be:src/main/kotlin/udumeoli/tripphoto/region/service/RegionNameService.kt`, `be:src/main/resources/db/migration/V10__complete_region_english_names.sql`(누락 영어명 11개 보충). `regions`는 로그인 토큰이 있어야 조회된다(없으면 `UNAUTHENTICATED`).
 - 시딩·컬럼 타입·출처 주석: `be:src/main/resources/db/migration/V1__init.sql` (`region` 테이블, "region 시딩 (168건)")
 - `(팟, 지역)` 유일키: `be:src/main/resources/db/migration/V7__flatten_trip_to_region_pin.sql`
 - 존재 검증: `be:src/main/kotlin/udumeoli/tripphoto/trip/service/TripCommandService.kt` (`REGION_NOT_FOUND`), 읽기 전용 저장소: `be:.../region/repository/RegionRepository.kt`

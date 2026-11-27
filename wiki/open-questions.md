@@ -248,3 +248,24 @@ verified: 2026-11-22
 - 근거: iOS 기준으로 앱스토어 바로가기를 노출하고 앱스토어로 보내자는 제안에 디자인하기로 했다. 노출 형태(배너·자동 이동)와 Android 적용 여부는 회의록에 없다(meeting:2026-11-12).
 - 확인 질문: 배너인가 자동 이동인가? Android 출시 뒤에도 적용하는가? 초대 링크로 들어온 사용자에게도 적용하는가?
 - 결정 / 근거 / 결정일: 미정
+
+<a id="q25"></a>
+
+## Q25. regionCode와 GeoJSON `properties.code`가 같은가
+
+- 상태: 열림
+- 영향 문서: [regions](contract/regions.md)
+- 근거: be#43의 스키마 주석과 `be:docs/api-localization.md`는 `regions`의 `regionCode`가 GeoJSON `properties.code`와 같다고 적는다. `contract/regions.md`는 병합 시 11곳과 광역시 8곳은 첫 구 코드가 들어가 다르다고 적는다(`fe:src/shared/lib/loadKoreaGeoJson.ts`).
+- 확인 질문: 어느 쪽이 맞는가? FE가 `regions`로 이름을 바꿀 때 `properties.code`로 조회해도 되는가?
+- 결정 / 근거 / 결정일: 미정
+
+<a id="q26"></a>
+
+## Q26. 재사용 초대 파티(팬 캠페인)의 규칙
+
+- 상태: 열림
+- 영향 문서: [pot](product/pot.md)
+- 근거: be#45는 `Party`에 재사용 초대 키·원본 파티 ID·참여 팬 ID를 추가하고 팬별 6인 파티를 만든다. 기존 `partyPreview`·`joinParty`를 쓰고 참여 시 Discord로 알린다. 본문만으로는 초대코드 형식, 정원 6명, 팟장 위임 규칙이 이 파티에 어떻게 적용되는지 알 수 없고 `docs/campaign-fan-routes.md`를 읽지 못했다.
+- 확인 질문: 재사용 초대로 만든 파티는 일반 파티의 초대·정원·나가기 규칙(D-011)을 그대로 따르는가? 캠페인이 끝나면 어떻게 되는가?
+- 결정 / 근거 / 결정일: 미정
+
